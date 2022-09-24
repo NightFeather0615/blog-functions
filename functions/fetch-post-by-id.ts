@@ -36,7 +36,7 @@ async function fetchPostById(postId: string): Promise<PostData> {
   let rawPostData = await notionClient.pages.retrieve({ page_id: postId });
   let postData = JSON.parse(JSON.stringify(rawPostData));
   let rawMarkdown = await notionToMarkdown.pageToMarkdown(postId);
-  let markdownString = notionToMarkdown.toMarkdownString(rawMarkdown).replace(/^  \<\/details\>$/mg, "</details>").replace(/^  $/mg, "<br/>");
+  let markdownString = notionToMarkdown.toMarkdownString(rawMarkdown).replace(/^  \<\/details\>$/mg, "</details>").replace(/^  $/mg, "\n");
   return new PostData(
     postId,
     postData.properties.Title.title[0].plain_text,
