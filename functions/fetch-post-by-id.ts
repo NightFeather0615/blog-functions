@@ -22,25 +22,6 @@ class PostData {
   ) {}
 }
 
-function parseMarkdownFrontmatter(
-  title: string,
-  description: string,
-  thumbnail: string,
-  createdAt: string,
-  lastEditedAt: string,
-  tags: Array<string>
-): string {
-  return `---
-layout: "../../layouts/BlogPost.astro"
-title: "${title}"
-description: "${description}"
-thumbnail: "${thumbnail}"
-createdAt: "${createdAt}"
-lastEditedAt: "${lastEditedAt}"
-tags: ${JSON.stringify(tags)}
----\n`
-}
-
 function parsePostTags(rawTags: Array<Object>): Array<string> {
   let result: Array<string> = [];
   rawTags.forEach((rawTag) => {
@@ -56,14 +37,6 @@ async function fetchPostById(postId: string): Promise<PostData> {
   let postData = JSON.parse(JSON.stringify(rawPostData));
   let rawMarkdown = await notionToMarkdown.pageToMarkdown(postId);
   let markdownString = notionToMarkdown.toMarkdownString(rawMarkdown).replace(/^  \<\/details\>$/mg, "</details>").replace(/^  $/mg, "<br/>");
-  let markdownFrontmatter = parseMarkdownFrontmatter(
-    postData.properties.Title.title[0].plain_text,
-    postData.properties.Description.rich_text[0].plain_text,
-    postData.properties.Thumbnail.files[0].external.url,
-    postData.created_time,
-    postData.last_edited_time,
-    parsePostTags(postData.properties.Tags.multi_select)
-  );
   return new PostData(
     postId,
     postData.properties.Title.title[0].plain_text,
@@ -72,7 +45,7 @@ async function fetchPostById(postId: string): Promise<PostData> {
     postData.created_time,
     postData.last_edited_time,
     parsePostTags(postData.properties.Tags.multi_select),
-    markdownFrontmatter + markdownString
+    markdownString
   );
 }
 
