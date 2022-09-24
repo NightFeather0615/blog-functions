@@ -11,7 +11,9 @@ class PostInfo {
     public id: string, 
     public title: string,
     public description: string,
-    public thumbnail: string
+    public thumbnail: string,
+    public createdAt: string,
+    public lastEditedAt: string
   ) {}
 }
 
@@ -32,7 +34,9 @@ async function fetchBlogPosts(): Promise<Array<PostInfo>> {
         postData.id,
         postData.properties.Title.title[0].plain_text,
         postData.properties.Description.rich_text[0].plain_text,
-        postData.properties.Thumbnail.files[0].external.url
+        postData.properties.Thumbnail.files[0].external.url,
+        postData.created_time,
+        postData.last_edited_time
       )
     );
   });
