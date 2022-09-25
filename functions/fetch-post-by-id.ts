@@ -22,39 +22,48 @@ class PostData {
   ) {}
 }
 
-function parsePostTags(rawTags: Array<Object>): Array<string> {
-  let result: Array<string> = [];
-  rawTags.forEach((rawTag) => {
-    result.push(
-      JSON.parse(JSON.stringify(rawTag)).name
+async function fetchPostById(postId: string): Promise<Object | PostData> {
+  try {
+    let rawPostData = await notionClient.pages.retrieve({ page_id: postId });
+    let postData = JSON.parse(JSON.stringify(rawPostData));
+    let rawMarkdown = await notionToMarkdown.pageToMarkdown(postId);
+    let markdownString = notionToMarkdown.toMarkdownString(rawMarkdown).replace(/^  \<\/details\>$/mg, "</details>").replace(/^  $/mg, "<br/>");
+    return new PostData(
+      postId,
+      postData.properties.Title.title[0].plain_text,
+      postData.properties.Description.rich_text[0].plain_text,
+      postData.properties.Thumbnail.files[0].external.url,
+      postData.created_time,
+      postData.last_edited_time,
+      postData.properties.Tags.multi_select.map((rawTag: { name: any; }) => {
+        return rawTag.name;
+      }),
+      markdownString
     );
-  });
-  return result;
-}
-
-async function fetchPostById(postId: string): Promise<PostData> {
-  let rawPostData = await notionClient.pages.retrieve({ page_id: postId });
-  let postData = JSON.parse(JSON.stringify(rawPostData));
-  let rawMarkdown = await notionToMarkdown.pageToMarkdown(postId);
-  let markdownString = notionToMarkdown.toMarkdownString(rawMarkdown).replace(/^  \<\/details\>$/mg, "</details>").replace(/^  $/mg, "<br/>");
-  return new PostData(
-    postId,
-    postData.properties.Title.title[0].plain_text,
-    postData.properties.Description.rich_text[0].plain_text,
-    postData.properties.Thumbnail.files[0].external.url,
-    postData.created_time,
-    postData.last_edited_time,
-    parsePostTags(postData.properties.Tags.multi_select),
-    markdownString
-  );
+  } catch {
+    return {
+      status: 400,
+      code: "validation_error"
+    }
+  }
 }
 
 import type { Handler } from "@netlify/functions";
 
 const handler: Handler = async (event, _) => {
+  if (event.queryStringParameters == null || event.queryStringParameters.id == undefined) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        status: 400,
+        code: "missing_parameters",
+        missing_parameters: ["id"]
+      }),
+    };
+  }
   return {
     statusCode: 200,
-    body: JSON.stringify(await fetchPostById(event.queryStringParameters!.id ?? "")),
+    body: JSON.stringify(await fetchPostById(event.queryStringParameters.id)),
   };
 };
 
