@@ -17,7 +17,7 @@ class PostInfo {
   ) {}
 }
 
-async function fetchBlogPosts(): Promise<Array<PostInfo>> {
+async function fetchPosts(): Promise<Array<PostInfo>> {
   let data = await notionClient.databases.query(
     {
       database_id: DATABASE_ID as string
@@ -46,7 +46,7 @@ async function fetchBlogPosts(): Promise<Array<PostInfo>> {
 const handler: Handler = async (_, __) => {
   return {
     statusCode: 200,
-    body: JSON.stringify(await fetchBlogPosts()),
+    body: JSON.stringify(await fetchPosts()),
   };
 };
 
