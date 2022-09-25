@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { NotionToMarkdown } from "notion-to-md";
+import { NotionToMarkdown } from 'notion-to-md';
 
 const { NOTION_SECRET } = process.env;
 const notionClient = new Client(
@@ -44,7 +44,7 @@ async function fetchPostById(postId: string): Promise<Object | PostData> {
     return {
       status: 400,
       code: "validation_error"
-    }
+    };
   }
 }
 
@@ -63,7 +63,7 @@ const handler: Handler = async (event, _) => {
   }
   return {
     statusCode: 200,
-    body: JSON.stringify(await fetchPostById(event.queryStringParameters.id)),
+    body: JSON.stringify(await fetchPostById(event.queryStringParameters.id))
   };
 };
 

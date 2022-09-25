@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import type { Handler } from "@netlify/functions";
+import type { Handler } from '@netlify/functions';
 
 const { NOTION_SECRET, DATABASE_ID } = process.env;
 const notionClient = new Client(
