@@ -37,7 +37,7 @@ async function fetchPosts(): Promise<Array<PostInfo>> {
         postData.properties.Description.rich_text[0].plain_text,
         postData.properties.Thumbnail.files[0].external.url,
         postData.created_time,
-        postData.last_edited_time,,
+        postData.last_edited_time,
         postData.properties.Tags.multi_select.map((rawTag: { name: any; }) => {
           return rawTag.name;
         }),
