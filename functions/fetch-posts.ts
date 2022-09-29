@@ -25,8 +25,7 @@ async function fetchPosts(): Promise<Array<PostInfo>> {
     }
   );
   let result: Array<PostInfo> = [];
-  data.results.forEach(async (rawPostData) => {
-    let postData = JSON.parse(JSON.stringify(rawPostData));
+  data.results.forEach(async (postData: any) => {
     if (!postData.properties.Public.checkbox) {
       return;
     }
